@@ -1,0 +1,6 @@
+streamlit
+opencv-python-headless
+mediapipe==0.10.14
+scikit-learn==1.9.0
+mysql-connector-python
+Pillow
