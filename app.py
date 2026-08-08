@@ -79,9 +79,8 @@ def load_models():
     with open("scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
 
-    # mediapipe 0.10.35 on Python 3.14 does not auto-expose .solutions
-    # Use the internal path directly as a guaranteed workaround
-    import mediapipe.python.solutions.hands as _mp_hands
+    # Import solutions directly - works in mediapipe 0.10.35
+    import mediapipe.solutions.hands as _mp_hands
     hands = _mp_hands.Hands(static_image_mode=True, max_num_hands=1)
     
     return clf, le, scaler, hands
