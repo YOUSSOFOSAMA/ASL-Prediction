@@ -81,9 +81,12 @@ def load_models():
         clf, le = pickle.load(f)
     with open("scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
-    mp_hands = mp.solutions.hands
+        
+    # Robust import for Linux servers (bypasses the missing .solutions namespace bug)
+    import mediapipe.python.solutions.hands as mp_hands
+    import mediapipe.python.solutions.drawing_utils as mp_drawing
+    
     hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1)
-    mp_drawing = mp.solutions.drawing_utils
     
     return clf, le, scaler, mp_hands, hands, mp_drawing
 
