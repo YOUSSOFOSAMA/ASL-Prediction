@@ -1,11 +1,8 @@
 import streamlit as st
-import cv2
 import numpy as np
-import mediapipe as mp
 import pickle
 import mysql.connector
 from PIL import Image
-import os
 
 st.set_page_config(page_title="ASL AI Predictor", page_icon="🤟", layout="wide")
 
@@ -81,17 +78,16 @@ def load_models():
         clf, le = pickle.load(f)
     with open("scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
-        
-    # Robust import for Linux servers (bypasses the missing .solutions namespace bug)
-    import mediapipe.python.solutions.hands as mp_hands
-    import mediapipe.python.solutions.drawing_utils as mp_drawing
-    
+
+    # Use the new MediaPipe 1.0.0 Tasks API — works on all Python versions
+    import mediapipe as mp
+    mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1)
     
-    return clf, le, scaler, mp_hands, hands, mp_drawing
+    return clf, le, scaler, hands
 
 try:
-    clf, le, scaler, mp_hands, hands, mp_drawing = load_models()
+    clf, le, scaler, hands = load_models()
 except Exception as e:
     st.error(f"Failed to load models. Ensure `asl_classifier.pkl` and `scaler.pkl` exist. Error: {e}")
     st.stop()
@@ -106,23 +102,26 @@ def get_db_connection():
             database="ai_proj"
         )
         return conn
-    except Exception as e:
+    except Exception:
         # Fails gracefully on Streamlit Cloud where localhost MySQL doesn't exist
         return None
 
 conn = get_db_connection()
 
 def save_to_db(image_array, label):
-    if conn and conn.is_connected():
+    if conn is not None:
         try:
-            cursor = conn.cursor()
-            image_bgr = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-            _, buffer = cv2.imencode('.jpg', image_bgr)
-            image_bytes = buffer.tobytes()
-            sql = "INSERT INTO predictions (label, image) VALUES (%s, %s)"
-            cursor.execute(sql, (label, image_bytes))
-            conn.commit()
-            cursor.close()
+            import io
+            if conn.is_connected():
+                cursor = conn.cursor()
+                img = Image.fromarray(image_array)
+                buf = io.BytesIO()
+                img.save(buf, format='JPEG')
+                image_bytes = buf.getvalue()
+                sql = "INSERT INTO predictions (label, image) VALUES (%s, %s)"
+                cursor.execute(sql, (label, image_bytes))
+                conn.commit()
+                cursor.close()
         except Exception as e:
             st.toast(f"Failed to save to database: {e}")
 
