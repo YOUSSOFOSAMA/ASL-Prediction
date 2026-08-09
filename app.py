@@ -37,13 +37,31 @@ st.markdown("""
         border-color: #00C9FF !important; color: #00C9FF !important;
         transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,201,255,0.3);
     }
+
+    /* Make the camera "Take Photo" button always bright and obvious */
+    [data-testid="stCameraInputButton"] {
+        background: linear-gradient(135deg, #00C9FF, #92FE9D) !important;
+        color: #0E1117 !important;
+        font-weight: 800 !important;
+        font-size: 1.1rem !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 12px 28px !important;
+        box-shadow: 0 4px 20px rgba(0, 201, 255, 0.5) !important;
+        transition: all 0.3s ease !important;
+        letter-spacing: 0.5px !important;
+    }
+    [data-testid="stCameraInputButton"]:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 30px rgba(0, 201, 255, 0.7) !important;
+        filter: brightness(1.1) !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown("<h1 class='main-title'>🤟 ASL AI Predictor</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Real-time American Sign Language Translation</p>", unsafe_allow_html=True)
 
-# ── Model loading ────────────────────────────────────────────────────────────
 
 TASK_MODEL_URL = (
     "https://storage.googleapis.com/mediapipe-models/"
@@ -53,7 +71,6 @@ TASK_MODEL_PATH = "hand_landmarker.task"
 
 @st.cache_resource
 def load_models():
-    # ── 1. Load classifier ────────────────────────────────────────────────
     if not os.path.exists("asl_classifier.pkl"):
         raise FileNotFoundError("asl_classifier.pkl not found in the app directory.")
     if not os.path.exists("scaler.pkl"):
@@ -64,12 +81,10 @@ def load_models():
     with open("scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
 
-    # ── 2. Download the Tasks model file if not already cached ────────────
     if not os.path.exists(TASK_MODEL_PATH):
         st.info("⬇️ Downloading MediaPipe hand landmarker model (~25 MB)…")
         urllib.request.urlretrieve(TASK_MODEL_URL, TASK_MODEL_PATH)
 
-    # ── 3. Build the Tasks-API HandLandmarker ─────────────────────────────
     try:
         import mediapipe as mp
         from mediapipe.tasks import python as mp_python
@@ -103,7 +118,6 @@ except Exception as e:
     st.error(f"❌ Unexpected error while loading models: {type(e).__name__}: {e}")
     st.stop()
 
-# ── Landmark normalisation (IDENTICAL to training pipeline) ──────────────────
 
 def normalize_landmarks(landmark_list):
     """
@@ -156,14 +170,12 @@ def predict_from_image(pil_image: Image.Image):
     label = le.inverse_transform(prediction)[0]
     return label, "ok"
 
-# ── Session state ────────────────────────────────────────────────────────────
 
 if "current_word" not in st.session_state:
     st.session_state.current_word = ""
 if "processed_image_id" not in st.session_state:
     st.session_state.processed_image_id = None
 
-# ── UI ───────────────────────────────────────────────────────────────────────
 
 col1, col2 = st.columns([1.2, 1], gap="large")
 
@@ -187,7 +199,6 @@ with col2:
             st.session_state.current_word = ""
             st.rerun()
 
-# ── Inference ────────────────────────────────────────────────────────────────
 
 if camera_image is not None:
     if camera_image.file_id != st.session_state.processed_image_id:
