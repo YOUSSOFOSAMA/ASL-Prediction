@@ -38,23 +38,21 @@ st.markdown("""
         transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,201,255,0.3);
     }
 
-    /* Make the camera "Take Photo" button always bright and obvious */
+    /* Make the camera "Take Photo" button match the other buttons */
     [data-testid="stCameraInputButton"] {
-        background: linear-gradient(135deg, #00C9FF, #92FE9D) !important;
-        color: #0E1117 !important;
-        font-weight: 800 !important;
-        font-size: 1.1rem !important;
-        border: none !important;
-        border-radius: 10px !important;
-        padding: 12px 28px !important;
-        box-shadow: 0 4px 20px rgba(0, 201, 255, 0.5) !important;
+        border-radius: 8px !important;
+        font-weight: bold !important;
         transition: all 0.3s ease !important;
-        letter-spacing: 0.5px !important;
+        background-color: rgba(255,255,255,0.1) !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        color: #FAFAFA !important;
     }
     [data-testid="stCameraInputButton"]:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 8px 30px rgba(0, 201, 255, 0.7) !important;
-        filter: brightness(1.1) !important;
+        background-color: rgba(0,201,255,0.2) !important;
+        border-color: #00C9FF !important;
+        color: #00C9FF !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(0,201,255,0.3) !important;
     }
 </style>
 """, unsafe_allow_html=True)
