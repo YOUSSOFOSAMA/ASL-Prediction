@@ -13,7 +13,7 @@ The application features a sleek, dark-mode web interface built with **Streamlit
 ---
 
 ## 🌟 Live Demo
-*(Insert your Streamlit Cloud link here once deployed! Example: `https://your-asl-app.streamlit.app`)*
+*https://asl-prediction-rmb9yscdovv9bhe9cxruv5.streamlit.app/#camera-input*
 
 ---
 
